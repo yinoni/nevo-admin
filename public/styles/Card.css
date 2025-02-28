@@ -1,0 +1,34 @@
+.card-container{
+    border: 2px solid #849AFA;
+    padding: 10px 25px;
+    border-radius: 10px;
+    width: 70%;
+    margin-bottom: 30px;
+}
+
+.card-container .card-top{
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.card-container .card-bottom{
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+}
+
+.card-bottom .hour{
+    display: flex;
+    align-items: center;
+}
+
+.card-bottom .hour img{
+    margin-left: 5px;
+}
+
+
+.card-bottom .delete-btn{
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
