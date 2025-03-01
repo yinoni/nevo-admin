@@ -13,8 +13,9 @@ function generateTimeSlots() {
     let startHour = 8;
     let endHour = 21;
 
+
     for (let hour = startHour; hour <= endHour; hour++) {
-        for (let minutes of [0, 30]) {
+        for (let minutes of [0, 15, 30, 45]) {
             if (hour === endHour && minutes !== 0) break; // Prevent adding 21:30
             let formattedHour = hour.toString().padStart(2, '0');
             let formattedMinutes = minutes.toString().padStart(2, '0');
