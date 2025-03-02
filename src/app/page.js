@@ -15,12 +15,12 @@ export default function Home() {
   const route = process.env.NEXT_PUBLIC_SERVER_URL;
   const [clients, setClients] = React.useState([]);
 
-  const onDeleteClient = (lineData) => {
+  const onCancelLine = (lineData) => {
     cancelLine(lineData);
   }
 
   let renderedClients = clients.map((client, key) => {
-    return <Card key={key} onDeleteBtn={onDeleteClient} client={client} />
+    return <Card key={key} onDeleteBtn={onCancelLine} client={client} />
   })
 
 
