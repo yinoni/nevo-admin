@@ -21,7 +21,7 @@ const DropDown = ({topic, items, onStartChange}) => {
   };
 
   return (
-    <Box sx={{ maxWidth: 140, width: '100%', marginTop: 5, marginBottom: 2 }}>
+    <Box sx={{ maxWidth: 140, width: '100%', marginTop: 2, marginBottom: 2 }}>
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">{topic}</InputLabel>
         <Select

@@ -56,7 +56,7 @@ const HoursPage = () => {
         let formattedDate = ""+date.format("DD/MM/YYYY");
         setDate(formattedDate);
     }
-    currentSelection
+    
     /*On Submit button clicked*/
     const onSubmitBtn = () => {
         let allHours = hours.slice(currentSelection, endSelection + 1);     
@@ -67,8 +67,14 @@ const HoursPage = () => {
     return (
         <div className="hours-container">
             <CustomDatePicker onChange={onDateChange} />
+            <div className="top-part" style={{display: 'flex', flexDirection: 'row-reverse'}}>
+                <input type="radio" />
+                <h4 className="topic" style={{marginTop: 30}}>בחירת שעות</h4>
+            </div>
+
             <DropDown topic='שעת התחלה' items={hours} onStartChange={onStartChange} />
             {active && <DropDown topic='שעת סיום' items={hours.slice(currentSelection + 1)} onStartChange={onEndChange} />}
+            
             <button className="submit-btn" onClick={onSubmitBtn}>עדכן</button>
         </div>
     );
