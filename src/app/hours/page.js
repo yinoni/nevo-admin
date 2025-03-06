@@ -68,7 +68,6 @@ const HoursPage = () => {
         <div className="hours-container">
             <CustomDatePicker onChange={onDateChange} />
             <div className="top-part" style={{display: 'flex', flexDirection: 'row-reverse'}}>
-                <input type="radio" />
                 <h4 className="topic" style={{marginTop: 30}}>בחירת שעות</h4>
             </div>
 
