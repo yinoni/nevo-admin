@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CustomDatePicker from "../../../public/components/CustomDatePicker";
 import DropDown from "../../../public/components/DropDown";
 import '../../../public/styles/HoursPage.css';
@@ -12,6 +12,9 @@ import axios from "axios";
 import {route} from '../../consts.js';
 import { removeHourFromDate } from "@/socket/events";
 import socket from "@/socket/socket";
+import { Fab } from "@mui/material";
+import CustomDialog from "../../../public/components/CustomDialog";
+
 
 function generateTimeSlots() {
     let times = [];
@@ -35,13 +38,19 @@ const HoursPage = () => {
     const [currentSelection, setCurrentSelection] = useState(0);
     const [endSelection, setEnd] = useState(-1);
     const [active, setActive] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedDate, setDate] = useState(null);
     const [currentOption, setOption] = useState(0);
     const [hoursOnDate, setHoursOnDate] = useState([]);
     const hours = generateTimeSlots();
+    const dateRef = useRef(selectedDate);
+    const hoursRef = useRef(hoursOnDate);
     
-    const onChipClicked = (chipText) => {
+    const onChipClicked = async (chipText) => {
         removeHourFromDate({date: selectedDate, hour: chipText});
+        setHoursOnDate(hoursOnDate.filter(hour => {
+            return hour !== chipText;
+        }))
     }
     
     const renderedHoursChips = hoursOnDate.map((hour, key) => {
@@ -66,7 +75,25 @@ const HoursPage = () => {
         let currentDate = dayjs().format("DD/MM/YYYY");
         getHours(currentDate);
         setDate(currentDate);
+        
+        if (!socket) return; // לוודא שה-socket קיים
+
         socket.connect();
+
+        const handlingAddLine = (line) => {
+            if(line.date === dateRef.current){
+                setHoursOnDate(hoursRef.current.filter(hour => {
+                    return hour !== line.hour;
+                }));
+            }
+        }
+
+        /*This listens fot he emit after the user added single hour*/
+        socket.on("postAddedSpecificHour", (data) => {
+            getHours(data.date);
+        });
+    
+        socket.on("addedLine", handlingAddLine);
 
         return () => {
             socket.off("connect");
@@ -74,13 +101,14 @@ const HoursPage = () => {
 
     }, []);
 
-    socket.on("addedLine", (line) => {
-        if(line.date === selectedDate){
-            setHoursOnDate(hoursOnDate.filter(hour => {
-                return hour !== line.hour;
-            }));
-        }
-    });
+    useEffect(() => {
+        dateRef.current = selectedDate;
+    }, [selectedDate]);
+
+    useEffect(() => {
+        hoursRef.current = hoursOnDate;
+    }, [hoursOnDate]);
+    
 
     
     /*Change the start hour*/
@@ -115,6 +143,23 @@ const HoursPage = () => {
         setEnd(-1);
     }
 
+
+    const onAddHourClick = () => {
+        setDialogOpen(true);
+        console.log('Add specific hour!');
+    }
+
+    /*Gets called when the dialog closed*/
+    const onDialogClose = () => {
+        setDialogOpen(false);
+    }
+
+    /*THis function gets called when the admin add new hour*/
+    const onChoseHour = (choosenHour) => {
+        socket.emit("addSpecificHour", {date: selectedDate, hour: choosenHour});
+    }
+
+    
     
 
     return (
@@ -126,20 +171,23 @@ const HoursPage = () => {
                     <h4 className="topic" style={{marginTop: 30}}>בחירת שעות</h4>
                     <DropDown topic='שעת התחלה' items={hours} onStartChange={onStartChange} />
                     {active && <DropDown topic='שעת סיום' items={hours.slice(currentSelection + 1)} onStartChange={onEndChange} />}
+                    <button className="submit-btn" onClick={onSubmitBtn}>עדכן</button>
                 </div>
             :
                 <div className="updateHours">
                     <h4 style={{marginTop: 20, marginBottom: 20}} className="topic">ערוך שעות</h4>
-                    <div className="chips-container">
-                        {renderedHoursChips}
+                    <div className="update-hours-body">
+                        <div className="chips-container">
+                            {renderedHoursChips}
+                        </div>
+                        <Fab onClick={onAddHourClick} sx={{backgroundColor: '#849AFA'}} color="primary" aria-label="add">
+                            <h1>+</h1>
+                        </Fab>
                     </div>
-                    
                 </div>
-
             }
             
-            
-            <button className="submit-btn" onClick={onSubmitBtn}>עדכן</button>
+            <CustomDialog onHourAccept={onChoseHour} openState={dialogOpen} onClose={onDialogClose} />
         </div>
     );
 }

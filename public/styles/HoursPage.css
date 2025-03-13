@@ -19,8 +19,14 @@
     cursor: pointer;
 }
 
+.update-hours-body{
+    display: flex;
+    align-items: center;
+}
+
 .chips-container{
     display: flex;
-    width: 300px;
+    max-width: 270px;
     overflow-x: scroll;
+    margin-right: 20px;
 }
