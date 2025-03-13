@@ -30,3 +30,11 @@
     overflow-x: scroll;
     margin-right: 20px;
 }
+
+
+.alert-btn{
+    background-color: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}

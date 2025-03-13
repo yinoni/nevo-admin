@@ -14,7 +14,9 @@ import { removeHourFromDate } from "@/socket/events";
 import socket from "@/socket/socket";
 import { Fab } from "@mui/material";
 import CustomDialog from "../../../public/components/CustomDialog";
-
+import Alert from '@mui/material/Alert';
+import xmark from '../../../public/assets/xmark.svg';
+import Image from "next/image";
 
 function generateTimeSlots() {
     let times = [];
@@ -42,6 +44,7 @@ const HoursPage = () => {
     const [selectedDate, setDate] = useState(null);
     const [currentOption, setOption] = useState(0);
     const [hoursOnDate, setHoursOnDate] = useState([]);
+    const [alertState, setAlertState] = useState({open: false, msg: ""});
     const hours = generateTimeSlots();
     const dateRef = useRef(selectedDate);
     const hoursRef = useRef(hoursOnDate);
@@ -50,7 +53,7 @@ const HoursPage = () => {
         removeHourFromDate({date: selectedDate, hour: chipText});
         setHoursOnDate(hoursOnDate.filter(hour => {
             return hour !== chipText;
-        }))
+        }));
     }
     
     const renderedHoursChips = hoursOnDate.map((hour, key) => {
@@ -91,6 +94,7 @@ const HoursPage = () => {
         /*This listens fot he emit after the user added single hour*/
         socket.on("postAddedSpecificHour", (data) => {
             getHours(data.date);
+           setAlertState({open: true, msg: `השעה ${data.hour} התווספה בהצלחה`});
         });
     
         socket.on("addedLine", handlingAddLine);
@@ -134,6 +138,7 @@ const HoursPage = () => {
         let allHours = hours.slice(currentSelection, endSelection + 1);     
         setHoursOnDate(allHours);
         updateLineHours({date: selectedDate, hours: allHours});
+        setAlertState({open: true, msg: "!השעות שבחרת התעדכנו בהצלחה"});
     }
 
     const onSliderChange = (newValue) => {
@@ -166,6 +171,7 @@ const HoursPage = () => {
         <div className="hours-container">
             <CustomSlider onChange={onSliderChange} />
             <CustomDatePicker onChange={onDateChange} />
+            
             {currentOption === 0 ? 
                 <div style={{width: '50%'}} className="chooseHours">
                     <h4 className="topic" style={{marginTop: 30}}>בחירת שעות</h4>
@@ -188,6 +194,23 @@ const HoursPage = () => {
             }
             
             <CustomDialog onHourAccept={onChoseHour} openState={dialogOpen} onClose={onDialogClose} />
+            {alertState.open && 
+            <Alert
+                sx={{width: "80%", marginTop: 5}} 
+                severity="success"
+                action={
+                    <button
+                        className="alert-btn"
+                        onClick={() => {
+                            setAlertState({...alertState, open: false});
+                        }}
+                    >
+                    <Image className="alert-icon" width={15} src={xmark} alt="xmark" />
+                    </button>
+                }
+             >
+                {alertState.msg}
+            </Alert>}
         </div>
     );
 }
